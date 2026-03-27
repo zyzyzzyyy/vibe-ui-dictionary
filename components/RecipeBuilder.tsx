@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { dimensions, generatePrompt, type DimensionOption } from '@/lib/recipes';
 import { RecipeOutput } from './RecipeOutput';
@@ -14,22 +14,18 @@ export function RecipeBuilder({ onGenerated }: RecipeBuilderProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [selections, setSelections] = useState<Record<string, string>>({});
-  const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
-  const [showPreview, setShowPreview] = useState(true);
-  const [initialized, setInitialized] = useState(false);
-
-  useEffect(() => {
-    const initialSelections: Record<string, string> = {};
+  const getInitialSelections = () => {
+    const initial: Record<string, string> = {};
     dimensions.forEach(d => {
       const val = searchParams.get(d.id);
-      if (val) initialSelections[d.id] = val;
+      if (val) initial[d.id] = val;
     });
-    if (Object.keys(initialSelections).length > 0) {
-      setSelections(initialSelections);
-    }
-    setInitialized(true);
-  }, [searchParams]);
+    return initial;
+  };
+
+  const [selections, setSelections] = useState<Record<string, string>>(getInitialSelections);
+  const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
+  const [showPreview, setShowPreview] = useState(true);
 
   const handleSelect = (dimensionId: string, optionId: string) => {
     const newSelections = { ...selections, [dimensionId]: optionId };
@@ -53,16 +49,6 @@ export function RecipeBuilder({ onGenerated }: RecipeBuilderProps) {
 
   const isComplete = dimensions.every(d => selections[d.id]);
   const hasSelections = Object.keys(selections).length > 0;
-
-  if (!initialized) {
-    return (
-      <div className="space-y-6">
-        <div className="bg-slate-900 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[200px]">
-          <div className="text-slate-500 text-sm">加载中...</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Fuse from 'fuse.js';
 import { EffectCard } from '@/components/EffectCard';
@@ -16,14 +16,16 @@ export function ClientPage() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<Tab>('effects');
 
-  useEffect(() => {
+  const getInitialTab = (): Tab => {
     const tabParam = searchParams.get('tab');
     if (tabParam === 'effects' || tabParam === 'recipes' || tabParam === 'compare') {
-      setActiveTab(tabParam);
+      return tabParam;
     }
-  }, [searchParams]);
+    return 'effects';
+  };
+
+  const [activeTab, setActiveTab] = useState<Tab>(getInitialTab);
 
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab);
