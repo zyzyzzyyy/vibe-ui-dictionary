@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Fuse from 'fuse.js';
 import { EffectCard } from '@/components/EffectCard';
 import { effects, categories } from '@/lib/effects';
@@ -11,9 +12,27 @@ import { CompareView } from '@/components/CompareView';
 type Tab = 'effects' | 'recipes' | 'compare';
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('effects');
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'effects' || tabParam === 'recipes' || tabParam === 'compare') {
+      setActiveTab(tabParam);
+    }
+    setInitialized(true);
+  }, [searchParams]);
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+    router.push(`/?${params.toString()}`, { scroll: false });
+  };
 
   const fuse = useMemo(() => new Fuse(effects, {
     keys: ['name', 'namePinyin', 'prompt'],
@@ -51,7 +70,7 @@ export default function Home() {
           
           <div className="flex gap-2 mb-4">
             <button
-              onClick={() => setActiveTab('effects')}
+              onClick={() => handleTabChange('effects')}
               className={`px-4 py-2 text-sm rounded-lg transition-colors ${
                 activeTab === 'effects'
                   ? 'bg-indigo-500 text-white'
@@ -61,7 +80,7 @@ export default function Home() {
               动效词条
             </button>
             <button
-              onClick={() => setActiveTab('recipes')}
+              onClick={() => handleTabChange('recipes')}
               className={`px-4 py-2 text-sm rounded-lg transition-colors ${
                 activeTab === 'recipes'
                   ? 'bg-indigo-500 text-white'
@@ -71,7 +90,7 @@ export default function Home() {
               配方生成
             </button>
             <button
-              onClick={() => setActiveTab('compare')}
+              onClick={() => handleTabChange('compare')}
               className={`px-4 py-2 text-sm rounded-lg transition-colors ${
                 activeTab === 'compare'
                   ? 'bg-indigo-500 text-white'

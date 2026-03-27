@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { dimensions, generatePrompt, type DimensionOption } from '@/lib/recipes';
 import { RecipeOutput } from './RecipeOutput';
 import { RecipeVisualizer } from './recipe/RecipeVisualizer';
@@ -10,15 +11,32 @@ interface RecipeBuilderProps {
 }
 
 export function RecipeBuilder({ onGenerated }: RecipeBuilderProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [showPreview, setShowPreview] = useState(true);
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    const initialSelections: Record<string, string> = {};
+    dimensions.forEach(d => {
+      const val = searchParams.get(d.id);
+      if (val) initialSelections[d.id] = val;
+    });
+    if (Object.keys(initialSelections).length > 0) {
+      setSelections(initialSelections);
+    }
+    setInitialized(true);
+  }, [searchParams]);
 
   const handleSelect = (dimensionId: string, optionId: string) => {
-    setSelections(prev => ({
-      ...prev,
-      [dimensionId]: optionId,
-    }));
+    const newSelections = { ...selections, [dimensionId]: optionId };
+    setSelections(newSelections);
+    const params = new URLSearchParams();
+    Object.entries(newSelections).forEach(([k, v]) => params.set(k, v));
+    router.push(`/?tab=recipes&${params.toString()}`, { scroll: false });
   };
 
   const handleGenerate = () => {
@@ -30,10 +48,21 @@ export function RecipeBuilder({ onGenerated }: RecipeBuilderProps) {
   const handleReset = () => {
     setSelections({});
     setGeneratedPrompt('');
+    router.push('/?tab=recipes', { scroll: false });
   };
 
   const isComplete = dimensions.every(d => selections[d.id]);
   const hasSelections = Object.keys(selections).length > 0;
+
+  if (!initialized) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-slate-900 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[200px]">
+          <div className="text-slate-500 text-sm">加载中...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
