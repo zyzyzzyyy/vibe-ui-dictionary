@@ -116,8 +116,21 @@ function ClientPage() {
   }), []);
 
   const searchResults = useMemo(() => {
-    if (!query.trim()) return effects.map(e => e.id);
-    return fuse.search(query).map(r => r.item.id);
+    const q = query.trim().toLowerCase();
+    if (!q) return effects.map(e => e.id);
+    // Native Chinese-friendly search
+    const ids = effects
+      .filter(e => 
+        e.name.toLowerCase().includes(q) ||
+        e.namePinyin.toLowerCase().includes(q) ||
+        e.prompt.toLowerCase().includes(q)
+      )
+      .map(e => e.id);
+    // Fallback to Fuse for fuzzy matches
+    if (ids.length === 0) {
+      return fuse.search(query).map(r => r.item.id);
+    }
+    return ids;
   }, [query, fuse]);
 
   const filteredEffects = useMemo(() => {
