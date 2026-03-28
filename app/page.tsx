@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Fuse from 'fuse.js';
 import { EffectCard } from '@/components/EffectCard';
 import { EffectModal } from '@/components/EffectModal';
-import { DarkModeToggle } from '@/components/DarkModeToggle';
 import { effects, categories, Effect } from '@/lib/effects';
 import { RecipeBuilder } from '@/components/RecipeBuilder';
 import { PresetRecipeGrid } from '@/components/PresetRecipeCard';
@@ -32,13 +31,12 @@ function HeroFallback() {
   effects.forEach(e => { categoryCount[e.category] = (categoryCount[e.category] || 0) + 1; });
 
   return (
-    <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 pt-8 pb-12">
+    <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-950 dark:border-slate-800 pt-8 pb-12">
       <div className="max-w-4xl mx-auto px-4 pt-10 pb-6 w-full">
-        <div className="text-center mb-6 flex items-center justify-center gap-4">
-          <h1 className="text-4xl font-bold text-gray-800">
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
             🎨 <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Vibe UI</span>
           </h1>
-          <DarkModeToggle />
         </div>
         <p className="text-center text-sm text-gray-400 mb-4">
           感觉词 → 前端动效 · 50+ 精选效果
@@ -185,13 +183,12 @@ function ClientPage() {
     return (
       <main className="min-h-screen bg-gray-50">
         {/* HERO - compact, content at top, blank at bottom */}
-        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 pt-8 pb-12">
+        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-950 dark:border-slate-800 pt-8 pb-12">
           <div className="max-w-4xl mx-auto px-4 pt-10 pb-6 w-full">
-            <div className="text-center mb-6 flex items-center justify-center gap-4">
+            <div className="text-center mb-6">
               <h1 className="text-4xl font-bold text-gray-800">
                 🎨 <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Vibe UI</span>
               </h1>
-              <DarkModeToggle />
             </div>
             <p className="text-center text-sm text-gray-400 mb-4">
               感觉词 → 前端动效 · 50+ 精选效果
