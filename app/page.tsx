@@ -31,7 +31,7 @@ function HeroFallback() {
   effects.forEach(e => { categoryCount[e.category] = (categoryCount[e.category] || 0) + 1; });
 
   return (
-    <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 h-screen flex flex-col justify-center">
+    <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 min-h-[60vh] flex flex-col justify-center">
       <div className="max-w-4xl mx-auto px-4 pt-10 pb-6 w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
@@ -180,8 +180,8 @@ function ClientPage() {
   if (activeTab === 'effects') {
     return (
       <main className="min-h-screen bg-gray-50">
-        {/* HERO - sticky so it never scrolls away */}
-        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 h-screen flex flex-col justify-center">
+        {/* HERO */}
+        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 min-h-[60vh] flex flex-col justify-center">
           <div className="max-w-4xl mx-auto px-4 pt-10 pb-6 w-full">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold text-gray-800 mb-2">
