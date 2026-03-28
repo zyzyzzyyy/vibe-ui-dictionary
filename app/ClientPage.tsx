@@ -97,8 +97,8 @@ export function ClientPage() {
   if (activeTab === 'effects') {
     return (
       <main className="min-h-screen bg-gray-50">
-        {/* HERO */}
-        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100">
+        {/* HERO - always visible first, takes most of initial viewport */}
+        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 min-h-[70vh] flex flex-col justify-center">
           <div className="max-w-4xl mx-auto px-4 pt-10 pb-6">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold text-gray-800 mb-2">
@@ -135,17 +135,15 @@ export function ClientPage() {
                 {categories.map(cat => {
                   const meta = categoryMeta[cat] || { icon: '📦', color: 'from-gray-400 to-gray-500' };
                   return (
-                    <button
+                    <div
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all hover:scale-105`}
-                      style={{ background: `linear-gradient(135deg, var(--tw-gradient-stops))` }}
+                      className={`relative flex flex-col items-center justify-center p-3 rounded-xl cursor-pointer transition-all hover:scale-105 bg-gradient-to-br ${meta.color} hover:shadow-lg`}
                     >
-                      <div className={`w-full h-full absolute inset-0 rounded-xl opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-br ${meta.color} -z-0`} />
-                      <span className="text-xl mb-1 relative z-10">{meta.icon}</span>
-                      <span className="text-xs font-medium text-gray-600 relative z-10">{cat}</span>
-                      <span className="text-xs text-gray-400 relative z-10">{categoryCount[cat]}</span>
-                    </button>
+                      <span className="text-xl mb-1">{meta.icon}</span>
+                      <span className="text-xs font-medium text-white/90">{cat}</span>
+                      <span className="text-xs text-white/60">{categoryCount[cat]}</span>
+                    </div>
                   );
                 })}
               </div>
