@@ -97,8 +97,8 @@ export function ClientPage() {
   if (activeTab === 'effects') {
     return (
       <main className="min-h-screen bg-gray-50">
-        {/* HERO - always visible first, takes most of initial viewport */}
-        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 min-h-[70vh] flex flex-col justify-center">
+        {/* HERO - always visible first, full first viewport */}
+        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 min-h-screen flex flex-col justify-center">
           <div className="max-w-4xl mx-auto px-4 pt-10 pb-6">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold text-gray-800 mb-2">
