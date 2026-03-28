@@ -280,12 +280,12 @@ function ClientPage() {
           <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4">
             {filteredEffects.map(effect => (
               <div key={effect.id} className="break-inside-avoid mb-4">
-                <button
+                <div
                   onClick={() => setSelectedEffect(effect)}
-                  className="w-full text-left"
+                  className="cursor-pointer"
                 >
                   <EffectCard effect={effect} />
-                </button>
+                </div>
               </div>
             ))}
           </div>

@@ -134,12 +134,12 @@ export function EffectCard({ effect, isModalPreview = false, modalIsPlaying, onC
           <h3 className="font-medium text-gray-800">{effect.name}</h3>
           {getTriggerBadge()}
         </div>
-        <button
+        <span
           onClick={handleFavorite}
-          className="text-lg hover:scale-110 transition-transform"
+          className="text-lg hover:scale-110 transition-transform cursor-pointer"
         >
           {isFav ? '❤️' : '🤍'}
-        </button>
+        </span>
       </div>
       
       {/* 复制按钮 */}
