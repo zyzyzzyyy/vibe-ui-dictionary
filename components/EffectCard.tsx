@@ -6,14 +6,20 @@ import { toggleFavorite, isFavorite as checkIsFavorite } from '@/lib/favorites';
 
 interface EffectCardProps {
   effect: Effect;
+  isModalPreview?: boolean;
+  modalIsPlaying?: boolean;
+  onCardClick?: () => void;
 }
 
-export function EffectCard({ effect }: EffectCardProps) {
+export function EffectCard({ effect, isModalPreview = false, modalIsPlaying, onCardClick }: EffectCardProps) {
   const [copied, setCopied] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [internalPlaying, setInternalPlaying] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isFav, setIsFav] = useState(false);
   const demoRef = useRef<HTMLDivElement>(null);
+
+  // For modal: use external playing state; otherwise use internal
+  const isPlaying = modalIsPlaying !== undefined ? modalIsPlaying : internalPlaying;
 
   useEffect(() => {
     setIsFav(checkIsFavorite(effect.id));
@@ -37,45 +43,60 @@ export function EffectCard({ effect }: EffectCardProps) {
   };
 
   const handleDemoClick = () => {
+    if (isModalPreview) {
+      onCardClick?.();
+      return;
+    }
     if (effect.trigger === 'click') {
-      setIsPlaying(true);
+      setInternalPlaying(true);
       setHasInteracted(true);
-      setTimeout(() => setIsPlaying(false), 1000);
+      setTimeout(() => setInternalPlaying(false), 1000);
     }
   };
 
   const handleDemoMouseEnter = () => {
-    if (effect.trigger === 'hover') {
-      setIsPlaying(true);
+    if (!isModalPreview && effect.trigger === 'hover') {
+      setInternalPlaying(true);
       setHasInteracted(true);
     }
   };
 
   const handleDemoMouseLeave = () => {
-    if (effect.trigger === 'hover') {
-      setIsPlaying(false);
+    if (!isModalPreview && effect.trigger === 'hover') {
+      setInternalPlaying(false);
     }
   };
 
   const getTriggerBadge = () => {
-    const colors: Record<string, string> = {
-      hover: 'bg-blue-100 text-blue-700',
-      click: 'bg-orange-100 text-orange-700',
-      auto: 'bg-green-100 text-green-700',
-      scroll: 'bg-purple-100 text-purple-700',
+    const styles: Record<string, { bg: string; icon: string; label: string }> = {
+      hover: { bg: 'bg-blue-100 text-blue-700', icon: '👆', label: '鼠标覆盖' },
+      click: { bg: 'bg-orange-100 text-orange-700', icon: '🖱️', label: '点击触发' },
+      auto: { bg: 'bg-green-100 text-green-700', icon: '✨', label: '自动播放' },
+      scroll: { bg: 'bg-purple-100 text-purple-700', icon: '↓', label: '滚动触发' },
     };
-    const labels: Record<string, string> = {
-      hover: '鼠标覆盖',
-      click: '点击',
-      auto: '自动',
-      scroll: '滚动',
-    };
+    const s = styles[effect.trigger] || styles.auto;
     return (
-      <span className={`text-xs px-2 py-0.5 rounded ${colors[effect.trigger]}`}>
-        {labels[effect.trigger]}
+      <span className={`text-xs px-1.5 py-0.5 rounded flex items-center gap-0.5 ${s.bg}`} title={s.label}>
+        <span>{s.icon}</span>
       </span>
     );
   };
+
+  // In modal preview mode: auto-play hover/auto animations
+  const modalPlaying = isModalPreview 
+    ? (effect.trigger === 'auto' || effect.trigger === 'hover' || effect.trigger === 'scroll' || isPlaying)
+    : isPlaying;
+
+  if (isModalPreview) {
+    return (
+      <div 
+        className="w-full flex items-center justify-center cursor-pointer"
+        onClick={handleDemoClick}
+      >
+        <EffectDemo effect={effect} isPlaying={modalPlaying} />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
