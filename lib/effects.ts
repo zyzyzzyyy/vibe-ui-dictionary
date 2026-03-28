@@ -460,6 +460,48 @@ export const effects: Effect[] = [
     prompt: '做一个脉冲边框效果，边框颜色在深浅之间呼吸闪烁。',
     code: '@keyframes pulse-border {\n  0%, 100% { border-color: rgba(102, 126, 234, 0.3); }\n  50% { border-color: rgba(102, 126, 234, 1); }\n}\n.pulse-border { animation: pulse-border 2s ease-in-out infinite; }'
   },
+  {
+    id: 'ui-dark-mode-toggle',
+    name: '深色模式切换',
+    namePinyin: 'shenseimoshiqiehuan',
+    category: 'UI 设计',
+    trigger: 'click',
+    prompt: '做一个精致的深色模式切换按钮，点击时太阳图标 morph 成月亮图标，轨道背景色平滑过渡，滑块带阴影和高光效果。',
+    code: `/* CSS 部分 */
+:root { --track-bg: #fbbf24; --thumb-bg: white; }
+.dark { --track-bg: #1e293b; --thumb-bg: #e2e8f0; color-scheme: dark; }
+
+.dark-mode-track {
+  position: relative;
+  width: 64px; height: 32px;
+  border-radius: 16px;
+  background: var(--track-bg);
+  transition: background 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+}
+.dark-mode-thumb {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--thumb-bg);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2), 0 0 8px rgba(255,200,0,0.4);
+  transition: left 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s ease;
+  position: relative;
+}
+.dark-mode-track::before { content: '☀️'; position: absolute; left: 36px; font-size: 14px; }
+.dark-mode-track.dark { background: var(--track-bg); }
+.dark-mode-track.dark .dark-mode-thumb { left: 34px; box-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 0 8px rgba(200,220,255,0.4); }
+.dark-mode-track.dark::before { content: '🌙'; }
+
+/* JS 部分 */
+document.querySelector('.dark-mode-track')?.addEventListener('click', function() {
+  this.classList.toggle('dark');
+  document.documentElement.classList.toggle('dark');
+  localStorage.setItem('theme', this.classList.contains('dark') ? 'dark' : 'light');
+});`
+  },
 ];
 
 export const categories = [
