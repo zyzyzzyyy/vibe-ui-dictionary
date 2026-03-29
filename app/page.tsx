@@ -7,8 +7,9 @@ import { EffectCard } from '@/components/EffectCard';
 import { EffectModal } from '@/components/EffectModal';
 import { effects, categories, Effect } from '@/lib/effects';
 import { RecipeBuilder } from '@/components/RecipeBuilder';
-import { PresetRecipeGrid } from '@/components/PresetRecipeCard';
+import { PresetRecipeCard, PresetRecipeGrid } from '@/components/PresetRecipeCard';
 import { SearchStickyBar } from '@/components/SearchStickyBar';
+import { CardGrid } from '@/components/CardGrid';
 
 type Tab = 'effects' | 'recipes';
 
@@ -224,18 +225,7 @@ function ClientPage() {
               : `全部 ${filteredEffects.length} 个效果`}
           </p>
 
-          <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4">
-            {filteredEffects.map(effect => (
-              <div key={effect.id} className="break-inside-avoid mb-4">
-                <div
-                  onClick={() => setSelectedEffect(effect)}
-                  className="cursor-pointer"
-                >
-                  <EffectCard effect={effect} />
-                </div>
-              </div>
-            ))}
-          </div>
+          <CardGrid effects={filteredEffects} onCardClick={setSelectedEffect} />
 
           {filteredEffects.length === 0 && (
             <div className="text-center py-20">
