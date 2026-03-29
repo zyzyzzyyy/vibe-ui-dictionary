@@ -1,6 +1,7 @@
 'use client';
 
 import { categories } from '@/lib/effects';
+import { useRef, useEffect, useState } from 'react';
 
 interface CategoryMeta {
   icon: string;
@@ -37,6 +38,63 @@ export function SearchStickyBar({
   onCategoryChange,
   searchRef,
 }: SearchStickyBarProps) {
+  const pillsRef = useRef<HTMLDivElement>(null);
+  const [rowFills, setRowFills] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    const el = pillsRef.current;
+    if (!el || query) return;
+
+    const GAP = 8;
+
+    function update() {
+      if (!el) return;
+      const items = Array.from(el.querySelectorAll<HTMLButtonElement>('[data-pill]'));
+      if (items.length === 0) return;
+
+      const containerWidth = el.offsetWidth;
+      const widths = items.map(it => it.offsetWidth);
+
+      const rows: number[][] = [];
+      let currentRow: number[] = [];
+      let currentRowWidth = 0;
+
+      widths.forEach((w, i) => {
+        if (currentRow.length > 0 && currentRowWidth + w > containerWidth) {
+          rows.push(currentRow);
+          currentRow = [i];
+          currentRowWidth = w + GAP;
+        } else {
+          currentRow.push(i);
+          currentRowWidth += w + GAP;
+        }
+      });
+      if (currentRow.length > 0) rows.push(currentRow);
+
+      const fills = new Array<boolean>(widths.length).fill(false);
+      rows.forEach((row, ri) => {
+        const rowW = row.reduce((s, idx) => s + widths[idx], 0) + (row.length - 1) * GAP;
+        const isLastRow = ri === rows.length - 1;
+        if (!isLastRow || rowW >= containerWidth) {
+          row.forEach(idx => { fills[idx] = true; });
+        }
+      });
+
+      setRowFills(fills);
+    }
+
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    update();
+
+    return () => observer.disconnect();
+  }, [query]);
+
+  const allItems = [
+    { key: '__all__', label: '全部', icon: '', isAll: true },
+    ...categories.map(cat => ({ key: cat, label: cat, icon: categoryMeta[cat]?.icon || '📦', isAll: false })),
+  ];
+
   return (
     <div className="sticky top-14 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 dark:bg-slate-900/95 dark:border-slate-800 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 py-3">
@@ -55,38 +113,33 @@ export function SearchStickyBar({
           </div>
         </div>
 
-          {!query && (
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => onCategoryChange(null)}
-                className={`flex-1 min-w-0 px-3 py-1.5 text-xs rounded-full transition-colors ${
-                  selectedCategory === null
-                    ? 'bg-gray-800 text-white'
-                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                }`}
-              >
-                全部
-              </button>
-              {categories.map(cat => {
-                const meta = categoryMeta[cat] || { icon: '📦', color: 'from-gray-400 to-gray-500' };
-                const isActive = selectedCategory === cat;
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => onCategoryChange(isActive ? null : cat)}
-                    className={`flex-1 min-w-0 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs rounded-full transition-all hover:scale-105 ${
-                      isActive
-                        ? 'bg-gradient-to-br ' + meta.color + ' text-white shadow-md'
+        {!query && (
+          <div ref={pillsRef} className="flex flex-wrap gap-2">
+            {allItems.map((item, idx) => {
+              const isActive = item.isAll ? selectedCategory === null : selectedCategory === item.key;
+              const fill = rowFills[idx] ?? false;
+              return (
+                <button
+                  key={item.key}
+                  data-pill
+                  onClick={() => onCategoryChange(item.isAll ? null : isActive ? null : item.key)}
+                  className={`${fill ? 'flex-1' : 'flex-none'} min-w-0 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs rounded-full transition-all hover:scale-105 ${
+                    item.isAll
+                      ? isActive
+                        ? 'bg-gray-800 text-white'
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                      : isActive
+                        ? 'bg-gradient-to-br ' + (categoryMeta[item.key]?.color || 'from-gray-400 to-gray-500') + ' text-white shadow-md'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <span>{meta.icon}</span>
-                    <span>{cat}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+                  }`}
+                >
+                  {item.icon && <span>{item.icon}</span>}
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {(query || selectedCategory) && (
           <div className="flex items-center gap-2 flex-wrap">

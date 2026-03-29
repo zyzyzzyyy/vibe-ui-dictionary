@@ -8,6 +8,7 @@ import { EffectModal } from '@/components/EffectModal';
 import { effects, categories, Effect } from '@/lib/effects';
 import { RecipeBuilder } from '@/components/RecipeBuilder';
 import { PresetRecipeGrid } from '@/components/PresetRecipeCard';
+import { SearchStickyBar } from '@/components/SearchStickyBar';
 
 type Tab = 'effects' | 'recipes';
 
@@ -182,94 +183,16 @@ function ClientPage() {
   if (activeTab === 'effects') {
     return (
       <main className="min-h-screen bg-gray-50">
-        {/* HERO - compact, content at top, blank at bottom */}
-        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-950 dark:border-slate-800 pt-8 pb-12">
-          <div className="max-w-4xl mx-auto px-4 pt-10 pb-6 w-full">
-            <div className="text-center mb-6">
-              <h1 className="text-4xl font-bold text-gray-800">
+        <div className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-100 dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-950 dark:border-slate-800 pt-8 pb-6">
+          <div className="max-w-4xl mx-auto px-4 pt-6 pb-2">
+            <div className="text-center mb-4">
+              <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-1">
                 🎨 <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Vibe UI</span>
               </h1>
-            </div>
-            <p className="text-center text-sm text-gray-400 mb-4">
-              感觉词 → 前端动效 · 50+ 精选效果
-            </p>
-
-            {/* Search */}
-            <div className="max-w-2xl mx-auto mb-4">
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">🔍</div>
-                <input
-                  ref={searchRef}
-                  type="text"
-                  placeholder="搜索感觉词：弹跳、玻璃、呼吸..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full pl-12 pr-20 py-4 text-base border-0 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded hidden md:block">
-                  按 / 聚焦
-                </div>
-              </div>
+              <p className="text-gray-400 text-sm">感觉词 → 前端动效 · 50+ 精选效果</p>
             </div>
 
-            {!query && (
-              <p className="text-center text-sm text-gray-400 mb-6">
-                💡 试试：「弹跳」「玻璃」「脉冲」「涟漪」
-              </p>
-            )}
-
-            {/* Category grid */}
-            {!query && !selectedCategory && (
-              <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mb-6">
-                {categories.map(cat => {
-                  const meta = categoryMeta[cat] || { icon: '📦', color: 'from-gray-400 to-gray-500' };
-                  return (
-                    <div
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`relative flex flex-col items-center justify-center p-3 rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-br ${meta.color}`}
-                    >
-                      <span className="text-xl mb-1">{meta.icon}</span>
-                      <span className="text-xs font-medium text-white/90">{cat}</span>
-                      <span className="text-xs text-white/60">{categoryCount[cat]}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Active filter pills */}
-            {(query || selectedCategory) && (
-              <div className="flex items-center gap-2 mb-4 flex-wrap">
-                {selectedCategory && (
-                  <button
-                    onClick={() => setSelectedCategory(null)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-sm hover:bg-indigo-200 transition-colors"
-                  >
-                    {categoryMeta[selectedCategory]?.icon} {selectedCategory} ×
-                  </button>
-                )}
-                {query && (
-                  <button
-                    onClick={() => setQuery('')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 transition-colors"
-                  >
-                    🔍 "{query}" ×
-                  </button>
-                )}
-                {(query || selectedCategory) && (
-                  <button
-                    onClick={() => { setQuery(''); setSelectedCategory(null); }}
-                    className="text-sm text-gray-400 hover:text-gray-600 underline"
-                  >
-                    清除全部
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Tab switcher */}
-            <div className="flex gap-2 justify-center mt-4">
+            <div className="flex gap-2 justify-center">
               <button
                 onClick={() => handleTabChange('effects')}
                 className="px-5 py-2 text-sm rounded-full font-medium bg-gray-800 text-white shadow"
@@ -278,7 +201,7 @@ function ClientPage() {
               </button>
               <button
                 onClick={() => handleTabChange('recipes')}
-                className="px-5 py-2 text-sm rounded-full font-medium bg-white text-gray-500 hover:bg-gray-100 shadow-sm"
+                className="px-5 py-2 text-sm rounded-full font-medium bg-white text-gray-500 hover:bg-gray-100 shadow-sm dark:bg-slate-800 dark:text-gray-300 dark:hover:bg-slate-700"
               >
                 🔥 配方生成
               </button>
@@ -286,8 +209,15 @@ function ClientPage() {
           </div>
         </div>
 
-        {/* CARDS */}
-        <div className="max-w-6xl mx-auto px-4 py-6 scroll-mt-0">
+        <SearchStickyBar
+          query={query}
+          onQueryChange={setQuery}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          searchRef={searchRef}
+        />
+
+        <div className="max-w-6xl mx-auto px-4 py-6">
           <p className="text-sm text-gray-500 mb-4">
             {query || selectedCategory
               ? `找到 ${filteredEffects.length} 个效果`
